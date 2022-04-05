@@ -82,17 +82,18 @@ void OverlayCopy::renderGrid(OledDisplay* display, const uint8_t xOffset, const 
 
       display->DrawRect(x, y, x + cellSize, y + cellSize, White, false);
 
-      const bool active = banks[col];
-      if (active)
+      if (banks.get(col))
          display->DrawRect(x + 2, y + 2, x + 4, y + 4, White, true);
    }
 }
 
-void OverlayCopy::selected()
+Abstract::Page::State OverlayCopy::selected()
 {
    source.midiChannel = target.midiChannel = main->getCurrentChannel();
    source.bankIndex = target.bankIndex = main->getBankIndex();
    source.scope = Scope::Single;
+
+   return State::Turn;
 }
 
 Abstract::Page::State OverlayCopy::forward()

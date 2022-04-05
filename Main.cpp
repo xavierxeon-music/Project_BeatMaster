@@ -11,7 +11,7 @@
 Main::Main()
    : Abstract::Patch("BeatMaster")
    , FlashSettings(this, 10)
-   , Midi::Handler::Internal(&daisy)
+   , Midi::Handler::Internal(&daisy, nullptr)
    , banks(this)
    , channelIndex(this, 0)
    , gates(this)
@@ -68,7 +68,7 @@ void Main::audioLoop(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out,
    (void)in;
 
    // input
-   const Input input = compileInput();
+   const ::Input input = compileInput();
    const ClockedTempo::Event event = tempo.advance(input, daisy.AudioCallbackRate());
    if (ClockedTempo::Event::Reset == event)
       clockReset();
@@ -78,7 +78,7 @@ void Main::audioLoop(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out,
    for (uint8_t index = 0; index < gates.getSize(); index++)
    {
       const bool gateActive = (Gate::Stage::High == gates[index].getCurrentStage());
-      bankIndex[index] = (input.knobs[index] >= 0.5);
+      bankIndex.set(index, (input.controlVoltages[index] >= 0.5));
 
       if (tempo.isRunningOrFirstTick())
          gateOscilators[index].setOn(gateActive);
@@ -86,7 +86,7 @@ void Main::audioLoop(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out,
          gateOscilators[index].setOn(false);
 
       if (gates[index].getApplyToKnobs() && gateActive)
-         bankIndex[index] = true;
+         bankIndex.set(index, true);
    }
 
    if (tempo.isRunningOrFirstTick())
@@ -125,7 +125,7 @@ void Main::audioLoop(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out,
    }
 
    // process output
-   Output output;
+   ::Output output;
    for (uint8_t index = 0; index < 2; index++)
    {
       // TODO: graphs

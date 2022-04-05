@@ -40,7 +40,7 @@ private:
 private:
    void render(OledDisplay* display) override;
    void renderGrid(OledDisplay* display, const uint8_t xOffset, const Location& location);
-   void selected() override;
+   State selected() override;
    State forward() override;
    State back() override;
    State clicked() override;

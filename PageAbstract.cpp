@@ -41,7 +41,7 @@ void PageAbstract::renderSide(OledDisplay* display, const bool lowerScreen)
 
       display->DrawRect(x, y, x + 4, y + 4, White, false);
 
-      if (banks[col])
+      if (banks.get(col))
          display->DrawRect(x + 1, y + 1, x + 3, y + 3, White, false);
    }
 
